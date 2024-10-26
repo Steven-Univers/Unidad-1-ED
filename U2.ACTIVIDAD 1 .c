@@ -1,69 +1,103 @@
 #include<stdio.h>
-
-#define NUM_ALIMENTOS 4
+#include<stdlib.h>
+#include<string.h>  
 
 int main()
 {
-    // Arreglos para almacenar nombres, precios y cantidades
-    char *alimentos[NUM_ALIMENTOS] = {"Hamburguesa", "Pizza", "Tacos", "Refresco"};
-    float precios[NUM_ALIMENTOS] = {50.00, 80.00, 25.00, 20.50};
-    int cantidades[NUM_ALIMENTOS] = {0, 0, 0, 0};
+    int num_alimentos;  
     int cantidad, opcion;
     char continuar;
 
-    printf("Bienvenido al restaurante\n");
+    
+    printf("¿Cuántos alimentos deseas ingresar?: ");
+    scanf("%d", &num_alimentos);
 
-    // Menú inicial
+    getchar();  
+
+    char **alimentos = (char **)malloc(num_alimentos * sizeof(char *));
+    for(int i = 0; i < num_alimentos; i++)
+    {
+        alimentos[i] = (char *)malloc(50 * sizeof(char));  
+    }
+
+    float *precios = (float *)malloc(num_alimentos * sizeof(float));
+    int *cantidades = (int *)malloc(num_alimentos * sizeof(int));
+
+    for(int i = 0; i < num_alimentos; i++)
+    {
+        cantidades[i] = 0;
+    }
+
+    printf("\nIngresa los nombres y precios de %d alimentos:\n", num_alimentos);
+    for(int i = 0; i < num_alimentos; i++)
+    {
+        printf("Nombre del alimento %d: ", i+1);
+        fgets(alimentos[i], 50, stdin);  
+        
+        alimentos[i][strcspn(alimentos[i], "\n")] = '\0';
+
+        printf("Precio de %s: ", alimentos[i]);
+        scanf("%f", &precios[i]);
+
+        getchar();  
+    }
+
+    printf("\nBienvenido al restaurante\n");
+
     do
     {
         printf("\nMenu:\n");
-        for(int i = 0; i < NUM_ALIMENTOS; i++)
+        for(int i = 0; i < num_alimentos; i++)
         {
             printf("%d - %s - $%.2f\n", i+1, alimentos[i], precios[i]);
         }
-        printf("5 - Finalizar pedido\n");
+        printf("%d - Finalizar pedido\n", num_alimentos + 1);
         printf("Elije una opcion: ");
         scanf("%d", &opcion);
 
-        // Verifica si la opción está dentro del rango de alimentos
-        if(opcion >= 1 && opcion <= NUM_ALIMENTOS)
+        if(opcion >= 1 && opcion <= num_alimentos)
         {
             printf("Ingresa la cantidad de %s: ", alimentos[opcion-1]);
             scanf("%d", &cantidad);
-            cantidades[opcion-1] += cantidad;  // Suma la cantidad a la existente
+            cantidades[opcion-1] += cantidad;  
 
-            // Pregunta si se desea continuar ordenando
-            printf("Deseas ordenar algo mas? (s/n): ");
+            printf("¿Deseas ordenar algo más? (s/n): ");
             scanf(" %c", &continuar);
         }
-        else if (opcion == 5)
+        else if (opcion == num_alimentos + 1)
         {
             printf("\nHas finalizado el pedido.\n");
-            continuar = 'n';  // Finaliza el ciclo
+            continuar = 'n';  
         }
         else
         {
             printf("Opción no válida. Intenta de nuevo.\n");
-            continuar = 's';  // Permite volver a elegir
+            continuar = 's';  
         }
 
     } while (continuar == 's' || continuar == 'S');
 
-    // Resumen de la cuenta
     float total_general = 0;
     printf("\nResumen de cuenta:\n");
-    for(int i = 0; i < NUM_ALIMENTOS; i++)
+    for(int i = 0; i < num_alimentos; i++)
     {
-        if(cantidades[i] > 0) // Solo mostrar alimentos que se pidieron
+        if(cantidades[i] > 0) 
         {
             float total_por_alimento = cantidades[i] * precios[i];
             printf("%s - $%.2f x %d = $%.2f\n", alimentos[i], precios[i], cantidades[i], total_por_alimento);
-            total_general += total_por_alimento; // Acumula el total general
+            total_general += total_por_alimento; 
         }
     }
 
-    // Muestra el total a pagar
     printf("\nTotal general a pagar: $%.2f\n", total_general);
+
+    for(int i = 0; i < num_alimentos; i++)
+    {
+        free(alimentos[i]);
+    }
+    free(alimentos);
+    free(precios);
+    free(cantidades);
 
     return 0;
 }
